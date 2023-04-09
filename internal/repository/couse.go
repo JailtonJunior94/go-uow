@@ -26,7 +26,9 @@ func NewCourseRepository(dtb *sql.DB) *CourseRepository {
 
 func (r *CourseRepository) Insert(ctx context.Context, course entity.Course) error {
 	return r.Queries.CreateCourse(ctx, db.CreateCourseParams{
-		Name:       course.Name,
-		CategoryID: course.CategoryID,
+		ID:          course.ID,
+		Name:        course.Name,
+		Description: course.Description,
+		CategoryID:  course.CategoryID,
 	})
 }

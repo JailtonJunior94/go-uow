@@ -1,0 +1,24 @@
+type Course {
+  id: ID!
+  name: String!
+  description: String
+}
+
+input NewCategory {
+  name: String!
+  description: String!
+}
+
+input NewCourse {
+  name: String!
+  description: String!
+  category: NewCategory!
+}
+
+extend type Query {
+  courses: [Course!]!
+}
+
+extend type Mutation {
+  createCourse(input: NewCourse!): Course! 
+}

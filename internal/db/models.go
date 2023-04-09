@@ -4,20 +4,17 @@
 
 package db
 
-import (
-	"database/sql"
-)
+import ()
 
 type Category struct {
 	ID          string
 	Name        string
-	Description sql.NullString
+	Description string
 }
 
 type Course struct {
 	ID          string
 	CategoryID  string
 	Name        string
-	Description sql.NullString
-	Price       string
+	Description string
 }

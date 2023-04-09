@@ -7,7 +7,6 @@ package db
 
 import (
 	"context"
-	"database/sql"
 )
 
 const createCategory = `-- name: CreateCategory :exec
@@ -17,7 +16,7 @@ INSERT INTO categories (id, name, description) VALUES ($1, $2, $3)
 type CreateCategoryParams struct {
 	ID          string
 	Name        string
-	Description sql.NullString
+	Description string
 }
 
 func (q *Queries) CreateCategory(ctx context.Context, arg CreateCategoryParams) error {
@@ -26,14 +25,13 @@ func (q *Queries) CreateCategory(ctx context.Context, arg CreateCategoryParams) 
 }
 
 const createCourse = `-- name: CreateCourse :exec
-INSERT INTO courses (id, name, description, price, category_id) VALUES ($1, $2, $3, $4, $5)
+INSERT INTO courses (id, name, description, category_id) VALUES ($1, $2, $3, $4)
 `
 
 type CreateCourseParams struct {
 	ID          string
 	Name        string
-	Description sql.NullString
-	Price       string
+	Description string
 	CategoryID  string
 }
 
@@ -42,7 +40,6 @@ func (q *Queries) CreateCourse(ctx context.Context, arg CreateCourseParams) erro
 		arg.ID,
 		arg.Name,
 		arg.Description,
-		arg.Price,
 		arg.CategoryID,
 	)
 	return err

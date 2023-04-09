@@ -1,9 +1,10 @@
 package entity
 
 type Category struct {
-	ID       int
-	Name     string
-	CourseID []string
+	ID          string
+	Name        string
+	Description string
+	CourseID    []string
 }
 
 func (c *Category) AddCourse(id string) {
@@ -11,7 +12,8 @@ func (c *Category) AddCourse(id string) {
 }
 
 type Course struct {
-	ID         int
-	Name       string
-	CategoryID string
+	ID          string
+	Name        string
+	Description string
+	CategoryID  string
 }
