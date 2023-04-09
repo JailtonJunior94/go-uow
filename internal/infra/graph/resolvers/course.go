@@ -26,7 +26,13 @@ func (r *mutationResolver) CreateCourse(ctx context.Context, input model.NewCour
 
 // CreateCourseUow is the resolver for the createCourseUow field.
 func (r *mutationResolver) CreateCourseUow(ctx context.Context, input model.NewCourse) (*model.Course, error) {
-	panic(fmt.Errorf("not implemented: CreateCourseUow - createCourseUow"))
+	category := &usecase.CategoryParams{Name: input.Category.Name, Description: input.Category.Description}
+	course := &usecase.CourseParams{Name: input.Name, Description: input.Description}
+
+	if err := r.AddCourseUow.Execute(ctx, category, course); err != nil {
+		return nil, err
+	}
+	return &model.Course{Name: course.Name, Description: &course.Description}, nil
 }
 
 // Courses is the resolver for the courses field.
