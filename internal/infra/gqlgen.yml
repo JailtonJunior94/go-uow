@@ -11,7 +11,7 @@ model:
 
 resolver:
   layout: follow-schema
-  dir: resolvers
+  dir: graph/resolvers
   package: resolvers
   filename_template: "{name}.go"
 

@@ -51,7 +51,8 @@ type ComplexityRoot struct {
 	}
 
 	Mutation struct {
-		CreateCourse func(childComplexity int, input model.NewCourse) int
+		CreateCourse    func(childComplexity int, input model.NewCourse) int
+		CreateCourseUow func(childComplexity int, input model.NewCourse) int
 	}
 
 	Query struct {
@@ -61,6 +62,7 @@ type ComplexityRoot struct {
 
 type MutationResolver interface {
 	CreateCourse(ctx context.Context, input model.NewCourse) (*model.Course, error)
+	CreateCourseUow(ctx context.Context, input model.NewCourse) (*model.Course, error)
 }
 type QueryResolver interface {
 	Courses(ctx context.Context) ([]*model.Course, error)
@@ -113,6 +115,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Mutation.CreateCourse(childComplexity, args["input"].(model.NewCourse)), true
+
+	case "Mutation.createCourseUow":
+		if e.complexity.Mutation.CreateCourseUow == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_createCourseUow_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.CreateCourseUow(childComplexity, args["input"].(model.NewCourse)), true
 
 	case "Query.courses":
 		if e.complexity.Query.Courses == nil {
@@ -213,14 +227,31 @@ extend type Query {
 }
 
 extend type Mutation {
-  createCourse(input: NewCourse!): Course! 
-}`, BuiltIn: false},
+  createCourse(input: NewCourse!): Course!
+  createCourseUow(input: NewCourse!): Course!
+}
+`, BuiltIn: false},
 }
 var parsedSchema = gqlparser.MustLoadSchema(sources...)
 
 // endregion ************************** generated!.gotpl **************************
 
 // region    ***************************** args.gotpl *****************************
+
+func (ec *executionContext) field_Mutation_createCourseUow_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 model.NewCourse
+	if tmp, ok := rawArgs["input"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
+		arg0, err = ec.unmarshalNNewCourse2githubᚗcomᚋjailtonjunior94ᚋgoᚑuowᚋinternalᚋinfraᚋgraphᚋmodelᚐNewCourse(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["input"] = arg0
+	return args, nil
+}
 
 func (ec *executionContext) field_Mutation_createCourse_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
@@ -476,6 +507,69 @@ func (ec *executionContext) fieldContext_Mutation_createCourse(ctx context.Conte
 	}()
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Mutation_createCourse_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_createCourseUow(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_createCourseUow(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().CreateCourseUow(rctx, fc.Args["input"].(model.NewCourse))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.Course)
+	fc.Result = res
+	return ec.marshalNCourse2ᚖgithubᚗcomᚋjailtonjunior94ᚋgoᚑuowᚋinternalᚋinfraᚋgraphᚋmodelᚐCourse(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_createCourseUow(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_Course_id(ctx, field)
+			case "name":
+				return ec.fieldContext_Course_name(ctx, field)
+			case "description":
+				return ec.fieldContext_Course_description(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Course", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_createCourseUow_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return
 	}
@@ -2586,6 +2680,15 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_createCourse(ctx, field)
+			})
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "createCourseUow":
+
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_createCourseUow(ctx, field)
 			})
 
 			if out.Values[i] == graphql.Null {

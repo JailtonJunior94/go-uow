@@ -5,9 +5,10 @@ import (
 	"net/http"
 
 	"github.com/jailtonjunior94/go-uow/configs"
+
 	"github.com/jailtonjunior94/go-uow/internal/infra/graph/generated"
-	"github.com/jailtonjunior94/go-uow/internal/infra/resolvers"
-	"github.com/jailtonjunior94/go-uow/internal/repository"
+	"github.com/jailtonjunior94/go-uow/internal/infra/graph/resolvers"
+	"github.com/jailtonjunior94/go-uow/internal/infra/repository"
 	"github.com/jailtonjunior94/go-uow/internal/usecase"
 	migration "github.com/jailtonjunior94/go-uow/pkg/database/migrate"
 	database "github.com/jailtonjunior94/go-uow/pkg/database/postgres"
@@ -48,7 +49,7 @@ func main() {
 	categoryRepository := repository.NewCategoryRepository(db)
 	addCourseUseCase := usecase.NewAddCourseUseCase(logger, courseRepository, categoryRepository)
 
-	srv := handler.NewDefaultServer(generated.NewExecutableSchema(generated.Config{Resolvers: &resolvers.Resolver{AddCourse: *addCourseUseCase}}))
+	srv := handler.NewDefaultServer(generated.NewExecutableSchema(generated.Config{Resolvers: &resolvers.Resolver{AddCourse: addCourseUseCase}}))
 
 	http.Handle("/", playground.Handler("GraphQL playground", "/query"))
 	http.Handle("/query", srv)

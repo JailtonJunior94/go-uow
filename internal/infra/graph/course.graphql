@@ -20,5 +20,6 @@ extend type Query {
 }
 
 extend type Mutation {
-  createCourse(input: NewCourse!): Course! 
+  createCourse(input: NewCourse!): Course!
+  createCourseUow(input: NewCourse!): Course!
 }

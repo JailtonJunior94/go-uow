@@ -24,6 +24,11 @@ func (r *mutationResolver) CreateCourse(ctx context.Context, input model.NewCour
 	return &model.Course{Name: course.Name, Description: &course.Description}, nil
 }
 
+// CreateCourseUow is the resolver for the createCourseUow field.
+func (r *mutationResolver) CreateCourseUow(ctx context.Context, input model.NewCourse) (*model.Course, error) {
+	panic(fmt.Errorf("not implemented: CreateCourseUow - createCourseUow"))
+}
+
 // Courses is the resolver for the courses field.
 func (r *queryResolver) Courses(ctx context.Context) ([]*model.Course, error) {
 	panic(fmt.Errorf("not implemented: Courses - courses"))

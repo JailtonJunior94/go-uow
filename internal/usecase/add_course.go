@@ -5,7 +5,7 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/jailtonjunior94/go-uow/internal/entity"
-	"github.com/jailtonjunior94/go-uow/internal/repository"
+	"github.com/jailtonjunior94/go-uow/internal/infra/repository"
 	"github.com/jailtonjunior94/go-uow/pkg/logger"
 )
 

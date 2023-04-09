@@ -4,8 +4,8 @@ import (
 	"context"
 	"database/sql"
 
-	"github.com/jailtonjunior94/go-uow/internal/db"
 	"github.com/jailtonjunior94/go-uow/internal/entity"
+	"github.com/jailtonjunior94/go-uow/internal/infra/db"
 )
 
 type CategoryRepositoryInterface interface {
