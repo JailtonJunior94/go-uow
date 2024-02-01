@@ -25,13 +25,15 @@ func NewAddCourseUowUseCase(logger logger.Logger, uow uow.UowInterface) *AddCour
 
 func (a *AddCourseUowUseCase) Execute(ctx context.Context, categoryParam *CategoryParams, courseParam *CourseParams) error {
 	return a.uow.Do(ctx, func(uow uow.UowInterface) error {
+		courseRepository := a.getCourseRepository(ctx)
+		categoryRepository := a.getCategoryRepository(ctx)
+
 		category := entity.Category{
 			ID:          uuid.New().String(),
 			Name:        categoryParam.Name,
 			Description: categoryParam.Description,
 		}
 
-		categoryRepository := a.getCategoryRepository(ctx)
 		err := categoryRepository.Insert(ctx, category)
 		if err != nil {
 			a.logger.Error(err)
@@ -45,7 +47,6 @@ func (a *AddCourseUowUseCase) Execute(ctx context.Context, categoryParam *Catego
 			CategoryID:  category.ID,
 		}
 
-		courseRepository := a.getCourseRepository(ctx)
 		err = courseRepository.Insert(ctx, course)
 		if err != nil {
 			a.logger.Error(err)

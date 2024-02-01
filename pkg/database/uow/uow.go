@@ -19,14 +19,14 @@ type UowInterface interface {
 }
 
 type uow struct {
-	DB           *sql.DB
-	TX           *sql.Tx
+	Db           *sql.DB
+	Tx           *sql.Tx
 	Repositories map[string]RepositoryFactory
 }
 
 func NewUow(ctx context.Context, db *sql.DB) UowInterface {
 	return &uow{
-		DB:           db,
+		Db:           db,
 		Repositories: make(map[string]RepositoryFactory),
 	}
 }
@@ -40,57 +40,61 @@ func (u *uow) UnRegister(name string) {
 }
 
 func (u *uow) GetRepository(ctx context.Context, name string) (interface{}, error) {
-	if u.TX == nil {
-		tx, err := u.DB.BeginTx(ctx, nil)
+	if u.Tx == nil {
+		tx, err := u.Db.BeginTx(ctx, nil)
 		if err != nil {
 			return nil, err
 		}
-		u.TX = tx
+		u.Tx = tx
 	}
-	repository := u.Repositories[name](u.TX)
-	return repository, nil
+
+	repo := u.Repositories[name](u.Tx)
+	return repo, nil
 }
 
-func (u *uow) Do(ctx context.Context, fn func(uow UowInterface) error) error {
-	if u.TX != nil {
-		return errors.New("transaction already started")
+func (u *uow) Do(ctx context.Context, fn func(Uow UowInterface) error) error {
+	if u.Tx != nil {
+		return fmt.Errorf("transaction already started")
 	}
 
-	tx, err := u.DB.BeginTx(ctx, nil)
+	tx, err := u.Db.BeginTx(ctx, nil)
 	if err != nil {
 		return err
 	}
-	u.TX = tx
 
-	if err = fn(u); err != nil {
-		if errRollback := u.Rollback(); errRollback != nil {
-			return fmt.Errorf("original error: %s, rollback error: %s", err, errRollback)
+	u.Tx = tx
+	err = fn(u)
+	if err != nil {
+		errRb := u.Rollback()
+		if errRb != nil {
+			return fmt.Errorf("original error: %s, rollback error: %s", err.Error(), errRb.Error())
 		}
 		return err
 	}
 	return u.CommitOrRollback()
 }
 
-func (u *uow) CommitOrRollback() error {
-	if err := u.TX.Commit(); err != nil {
-		if errRollback := u.Rollback(); errRollback != nil {
-			return fmt.Errorf("original error: %s, rollback error: %s", err, errRollback)
-		}
+func (u *uow) Rollback() error {
+	if u.Tx == nil {
+		return errors.New("no transaction to rollback")
+	}
+	err := u.Tx.Rollback()
+	if err != nil {
 		return err
 	}
-	u.TX = nil
+	u.Tx = nil
 	return nil
 }
 
-func (u *uow) Rollback() error {
-	if u.TX != nil {
-		return errors.New("no transaction to rollback")
-	}
-
-	if err := u.TX.Rollback(); err != nil {
+func (u *uow) CommitOrRollback() error {
+	err := u.Tx.Commit()
+	if err != nil {
+		errRb := u.Rollback()
+		if errRb != nil {
+			return fmt.Errorf("original error: %s, rollback error: %s", err.Error(), errRb.Error())
+		}
 		return err
 	}
-
-	u.TX = nil
+	u.Tx = nil
 	return nil
 }
