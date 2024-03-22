@@ -8,6 +8,9 @@ type Course struct {
 	Description *string `json:"description,omitempty"`
 }
 
+type Mutation struct {
+}
+
 type NewCategory struct {
 	Name        string `json:"name"`
 	Description string `json:"description"`
@@ -17,4 +20,7 @@ type NewCourse struct {
 	Name        string       `json:"name"`
 	Description string       `json:"description"`
 	Category    *NewCategory `json:"category"`
+}
+
+type Query struct {
 }
